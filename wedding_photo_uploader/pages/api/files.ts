@@ -24,11 +24,6 @@ interface GoogleScriptResponse {
   error?: string;
 }
 
-// Type definitions for the formidable file parsing
-interface ParsedFiles {
-  file: File[];
-}
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -36,7 +31,7 @@ export default async function handler(
   if (req.method === "POST") {
     const form = formidable({});
 
-    form.parse(req, async (err, fields, files: ParsedFiles) => {
+    form.parse(req, async (err, _: any, files: any) => {
       if (err) {
         console.error("Error parsing form:", err);
         return res
