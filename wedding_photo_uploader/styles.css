@@ -1,0 +1,59 @@
+:root {
+  --dark-green: #274442;
+  --blue-green: #4F7375;
+  --light-green: #748E81;
+  --grey-green: #8FA38E;
+  --another-grey-green: #A3BAB4;
+  --white: #E9E5E3;
+}
+
+body,
+html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url('public/image/background_image3.jpg');
+}
+
+label#uploadLabel {
+  display: inline-block;
+  padding: 48px 96px;
+  background-color: var(--dark-green);
+  color: var(--white);
+  font-size: 64px;
+  font-weight: bold;
+  border-radius: 15px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+  text-align: center;
+}
+
+label#uploadLabel:hover {
+  background-color: var(--blue-green);
+  transform: scale(1.25);
+}
+
+label#uploadLabel:active {
+  transform: scale(0.95);
+}
+
+#file {
+  display: none;
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin-slow {
+  animation: spin-slow 2s linear infinite;
+}

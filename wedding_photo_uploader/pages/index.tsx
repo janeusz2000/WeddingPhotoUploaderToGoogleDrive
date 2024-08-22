@@ -1,84 +1,107 @@
-// pages/index.tsx
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useState, ChangeEvent } from "react";
+import { FaCheckCircle, FaTimesCircle, FaSpinner } from "react-icons/fa";
+import { Great_Vibes } from 'next/font/google';
 
-interface FileData {
-  name: string;
-  url: string;
-  id: string;
-  mimeType: string;
-  dateCreated: string;
+const darkGreen = "#274442";
+// const blueGreen = "#4F7375";
+const lightGreen = "#748E81";
+// const greyGreen = "#8FA38E";
+// const anotherGreyGreen = "#A3BAB4";
+const white = "#E9E5E3";
+
+const greatVibes = Great_Vibes({
+  weight: '400',
+  subsets: ['latin'],
+});
+
+enum UploadStatus {
+  IDLE = 1,
+  UPLOADING,
+  SUCCESS,
+  FAILURE,
 }
 
 export default function Home() {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [files, setFiles] = useState<FileData[]>([]);
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>(
+    UploadStatus.IDLE,
+  );
 
-  useEffect(() => {
-    const fetchFiles = async () => {
-      const response = await fetch('/api/files');
-      const data: FileData[] = await response.json();
-      setFiles(data);
-    };
-
-    fetchFiles();
-  }, []);
-
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      setSelectedFile(event.target.files[0]);
-    }
-  };
+      setUploadStatus(UploadStatus.UPLOADING);
 
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      alert('Please select a file first.');
-      return;
-    }
+      const formData = new FormData();
+      formData.append("file", event.target.files[0]);
 
-    const formData = new FormData();
-    formData.append('file', selectedFile);
+      try {
+        const response = await fetch("/api/files", {
+          method: "POST",
+          body: formData,
+          headers: {
+            "x-file-name": event.target.files[0].name,
+            "x-file-type": event.target.files[0].type,
+          },
+        });
 
-    try {
-      const response = await fetch('/api/files', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'x-file-name': selectedFile.name,
-          'x-file-type': selectedFile.type,
-        },
-      });
+        const result = await response.json();
 
-      const result = await response.json();
+        if (response.ok) {
+          setUploadStatus(UploadStatus.SUCCESS);
+        } else {
+          console.error("Upload failed:", result.error);
+          setUploadStatus(UploadStatus.FAILURE);
+          alert("Upload failed: " + result.error);
+        }
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        setUploadStatus(UploadStatus.FAILURE);
+        alert("An unexpected error occurred during the upload.");
+      } finally {
+        const delay = 4000;
+        const timer = setTimeout(() => {
+          setUploadStatus(UploadStatus.IDLE);
+        }, delay);
 
-      if (response.ok) {
-        alert('File uploaded successfully!');
-        setFiles([...files, result]);
-      } else {
-        console.error('Upload failed:', result.error);
-        alert('Upload failed: ' + result.error);
+        return () => clearTimeout(timer);
       }
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      alert('An unexpected error occurred during the upload.');
     }
   };
 
   return (
-    <div>
-      <h1>Upload Image to Google Drive</h1>
-      <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload}>Upload</button>
-
-      <h2>Uploaded Files:</h2>
-      <ul>
-        {files.map((file, index) => (
-          <li key={index}>
-            <a href={file.url} target="_blank" rel="noopener noreferrer">
-              {file.name}
-            </a> (Uploaded on {new Date(file.dateCreated).toLocaleString()})
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <div className={`h-screen w-screen m-0 flex justify-center items-center bg-image3 bg-cover`}>
+        {uploadStatus === UploadStatus.IDLE && (
+          <div className={`${greatVibes.className} bg-[${darkGreen}] p-8 rounded-lg shadow-lg text-center transition-transform transform hover:scale-125 hover:bg-[#8FA38E]`}>
+            <label id="uploadLabel" htmlFor="file" className={`text-[${white}]`}>
+              Select Photos or Videos
+            </label>
+            <input
+              type="file"
+              id="file"
+              name="file"
+              multiple
+              accept="image/*,video/*"
+              onChange={handleFileChange}
+              className={`mt-4 cursor-pointer text-[${lightGreen}]`}
+            />
+          </div>
+        )}
+        {uploadStatus === UploadStatus.UPLOADING && (
+          <div className={`flex flex-col items-center`} style={{color: darkGreen}}>
+            <FaSpinner className="animate-spin spin-slow" size={100}/>
+          </div>
+        )}
+        {uploadStatus === UploadStatus.SUCCESS && (
+          <div className={`flex flex-col items-center`} style={{color: darkGreen}}>
+            <FaCheckCircle size={100} style={{ color: lightGreen }}/>
+          </div>
+        )}
+        {uploadStatus === UploadStatus.FAILURE && (
+          <div className={`flex flex-col items-center`} style={{color: darkGreen}}>
+            <FaTimesCircle size={100}/>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
