@@ -7,6 +7,12 @@
   --white: #E9E5E3;
 }
 
+body {
+  background-image: url('public/image/background_image3.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
 body,
 html {
   height: 100%;
@@ -14,15 +20,15 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url('public/image/background_image3.jpg');
 }
 
 label#uploadLabel {
   display: inline-block;
+  margin: 1px 16px;
   padding: 48px 96px;
   background-color: var(--dark-green);
   color: var(--white);
-  font-size: 64px;
+  font-size: 48px;
   font-weight: bold;
   border-radius: 15px;
   cursor: pointer;

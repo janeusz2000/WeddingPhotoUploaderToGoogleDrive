@@ -69,7 +69,7 @@ export default function Home() {
 
   return (
     <>
-      <div className={`h-screen w-screen m-0 flex justify-center items-center bg-image3 bg-cover`}>
+      <div className={`h-screen w-screen flex justify-center items-center bg-image3 bg-cover`}>
         {uploadStatus === UploadStatus.IDLE && (
           <div className={`${greatVibes.className} bg-[${darkGreen}] p-8 rounded-lg shadow-lg text-center transition-transform transform hover:scale-125 hover:bg-[#8FA38E]`}>
             <label id="uploadLabel" htmlFor="file" className={`text-[${white}]`}>
