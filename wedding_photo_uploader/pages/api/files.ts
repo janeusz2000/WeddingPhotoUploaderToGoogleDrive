@@ -1,10 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import formidable, { Fields, Files } from "formidable";
-import path from "path";
+import formidable from "formidable";
 import fs from "fs";
 
-const GOOGLE_SCRIPT_WEB_APP_URL =
-  "https://script.google.com/macros/s/AKfycbzKRfFdkhtLCGDVah_ik9aAwdmtVksGGFeLBKNs7etxVzMHf4sHU9UnyGAhtQtfJdwOSg/exec";
+const GOOGLE_SCRIPT_WEB_APP_URL = process.env.GOOGLE_SCRIPT_WEB_APP_URL? process.env.GOOGLE_SCRIPT_WEB_APP_URL : "";
 
 export const config = {
   api: {
