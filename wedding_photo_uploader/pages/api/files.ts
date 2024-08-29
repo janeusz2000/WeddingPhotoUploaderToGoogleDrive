@@ -1,8 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import formidable from "formidable";
 import fs from "fs";
+import {v4 as uuidv4} from "uuid";
 
-const GOOGLE_SCRIPT_WEB_APP_URL = process.env.GOOGLE_SCRIPT_WEB_APP_URL? process.env.GOOGLE_SCRIPT_WEB_APP_URL : "";
+const GOOGLE_SCRIPT_WEB_APP_URL = process.env.GOOGLE_SCRIPT_WEB_APP_URL
+  ? process.env.GOOGLE_SCRIPT_WEB_APP_URL
+  : "";
 
 export const config = {
   api: {
@@ -46,7 +49,7 @@ export default async function handler(
 
       // Iterate over each file in the files object
       for (const file of uploadedFiles) {
-        const fileName = file.originalFilename ?? "uploaded_file";
+        const fileName = `${uuidv4()}`;
         const mimeType = file.mimetype ?? "application/octet-stream";
 
         // Read the file into a buffer
@@ -74,7 +77,7 @@ export default async function handler(
           const data: GoogleScriptResponse = await response.json();
 
           if (response.ok) {
-            fileResponses.push({ success: true, file: data.file });
+            fileResponses.push({ success: true });
           } else {
             console.error("Error from Google Apps Script:", data.error);
             fileResponses.push({ success: false, error: data.error });
