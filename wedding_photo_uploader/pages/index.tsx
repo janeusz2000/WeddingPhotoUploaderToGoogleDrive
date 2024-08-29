@@ -1,17 +1,14 @@
 import { useState, ChangeEvent } from "react";
 import { FaCheckCircle, FaTimesCircle, FaSpinner } from "react-icons/fa";
-import { Great_Vibes } from 'next/font/google';
+import { Great_Vibes } from "next/font/google";
 
 const darkGreen = "#274442";
-// const blueGreen = "#4F7375";
 const lightGreen = "#748E81";
-// const greyGreen = "#8FA38E";
-// const anotherGreyGreen = "#A3BAB4";
 const white = "#E9E5E3";
 
 const greatVibes = Great_Vibes({
-  weight: '400',
-  subsets: ['latin'],
+  weight: "400",
+  subsets: ["latin"],
 });
 
 enum UploadStatus {
@@ -21,58 +18,89 @@ enum UploadStatus {
   FAILURE,
 }
 
+interface FileUploadStatus {
+  file: File;
+  status: UploadStatus;
+}
+
 export default function Home() {
-  const [uploadStatus, setUploadStatus] = useState<UploadStatus>(
-    UploadStatus.IDLE,
-  );
+  const [fileUploadStatuses, setFileUploadStatuses] = useState<
+    FileUploadStatus[]
+  >([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      setUploadStatus(UploadStatus.UPLOADING);
+      setIsUploading(true);
+      const filesArray = Array.from(event.target.files);
+      const initialStatuses = filesArray.map((file) => ({
+        file,
+        status: UploadStatus.UPLOADING,
+      }));
+      setFileUploadStatuses(initialStatuses);
 
-      const formData = new FormData();
-      formData.append("file", event.target.files[0]);
+      for (const file of filesArray) {
+        const fileIndex = filesArray.indexOf(file);
+        updateFileStatus(fileIndex, UploadStatus.UPLOADING);
 
-      try {
-        const response = await fetch("/api/files", {
-          method: "POST",
-          body: formData,
-          headers: {
-            "x-file-name": event.target.files[0].name,
-            "x-file-type": event.target.files[0].type,
-          },
-        });
+        const formData = new FormData();
+        formData.append("file", file);
 
-        const result = await response.json();
+        try {
+          const response = await fetch("/api/files", {
+            method: "POST",
+            body: formData,
+            headers: {
+              "x-file-name": file.name,
+              "x-file-type": file.type,
+            },
+          });
 
-        if (response.ok) {
-          setUploadStatus(UploadStatus.SUCCESS);
-        } else {
-          console.error("Upload failed:", result.error);
-          setUploadStatus(UploadStatus.FAILURE);
-          alert("Upload failed: " + result.error);
+          const result = await response.json();
+
+          if (response.ok) {
+            updateFileStatus(fileIndex, UploadStatus.SUCCESS);
+          } else {
+            console.error("Upload failed:", result.error);
+            updateFileStatus(fileIndex, UploadStatus.FAILURE);
+            alert("Upload failed: " + result.error);
+          }
+        } catch (error) {
+          console.error("Error uploading file:", error);
+          updateFileStatus(fileIndex, UploadStatus.FAILURE);
+          alert("An unexpected error occurred during the upload.");
         }
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        setUploadStatus(UploadStatus.FAILURE);
-        alert("An unexpected error occurred during the upload.");
-      } finally {
-        const delay = 4000;
-        const timer = setTimeout(() => {
-          setUploadStatus(UploadStatus.IDLE);
-        }, delay);
-
-        return () => clearTimeout(timer);
       }
+
+      setTimeout(() => {
+        setIsUploading(false);
+        setFileUploadStatuses([]);
+      }, 2000);
     }
+  };
+
+  const updateFileStatus = (index: number, status: UploadStatus) => {
+    setFileUploadStatuses((prevStatuses) => {
+      const newStatuses = [...prevStatuses];
+      newStatuses[index] = { ...newStatuses[index], status };
+      return newStatuses;
+    });
   };
 
   return (
     <>
-      <div className={`h-screen w-screen flex justify-center items-center bg-image3 bg-cover`}>
-        {uploadStatus === UploadStatus.IDLE && (
-          <div className={`${greatVibes.className} bg-[${darkGreen}] p-8 rounded-lg shadow-lg text-center transition-transform transform hover:scale-125 hover:bg-[#8FA38E]`}>
-            <label id="uploadLabel" htmlFor="file" className={`text-[${white}]`}>
+      <div
+        className={`h-screen w-screen flex justify-center items-center bg-image3 bg-cover`}
+      >
+        {fileUploadStatuses.length === 0 && (
+          <div
+            className={`${greatVibes.className} bg-[${darkGreen}] p-8 rounded-lg shadow-lg text-center transition-transform transform hover:scale-125 hover:bg-[#8FA38E]`}
+          >
+            <label
+              id="uploadLabel"
+              htmlFor="file"
+              className={`text-[${white}]`}
+            >
               Select Photos or Videos
             </label>
             <input
@@ -86,19 +114,32 @@ export default function Home() {
             />
           </div>
         )}
-        {uploadStatus === UploadStatus.UPLOADING && (
-          <div className={`flex flex-col items-center`} style={{color: darkGreen}}>
-            <FaSpinner className="animate-spin spin-slow" size={100}/>
-          </div>
-        )}
-        {uploadStatus === UploadStatus.SUCCESS && (
-          <div className={`flex flex-col items-center`} style={{color: darkGreen}}>
-            <FaCheckCircle size={100} style={{ color: lightGreen }}/>
-          </div>
-        )}
-        {uploadStatus === UploadStatus.FAILURE && (
-          <div className={`flex flex-col items-center`} style={{color: darkGreen}}>
-            <FaTimesCircle size={100}/>
+
+        {isUploading && (
+          <div
+            id="uploadStatusBox"
+            className={`${greatVibes.className} bg-[${darkGreen}]`}
+          >
+            {fileUploadStatuses.map((fileStatus, index) => (
+              <div key={index} className="file-status">
+                <div className="status-icon">
+                  {fileStatus.status === UploadStatus.UPLOADING && (
+                    <FaSpinner
+                      className="animate-spin spin-slow"
+                      size={24}
+                      style={{ color: lightGreen }}
+                    />
+                  )}
+                  {fileStatus.status === UploadStatus.SUCCESS && (
+                    <FaCheckCircle size={24} style={{ color: lightGreen }} />
+                  )}
+                  {fileStatus.status === UploadStatus.FAILURE && (
+                    <FaTimesCircle size={24} style={{ color: lightGreen }} />
+                  )}
+                </div>
+                <span className="file-name">{fileStatus.file.name}</span>
+              </div>
+            ))}
           </div>
         )}
       </div>

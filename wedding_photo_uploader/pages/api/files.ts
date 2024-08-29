@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import formidable, { File } from "formidable";
+import formidable, { Fields, Files } from "formidable";
+import path from "path";
 import fs from "fs";
 
 const GOOGLE_SCRIPT_WEB_APP_URL =
@@ -30,7 +31,6 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     const form = formidable({});
-
     form.parse(req, async (err, _: any, files: any) => {
       if (err) {
         console.error("Error parsing form:", err);
@@ -39,49 +39,64 @@ export default async function handler(
           .json({ success: false, error: "Error parsing form data." });
       }
 
-      const file = files.file[0]; // Assuming only one file is uploaded
-      const fileName = file.originalFilename ?? "uploaded_file";
-      const mimeType = file.mimetype ?? "application/octet-stream";
+      const fileResponses = [];
 
-      // Read the file into a buffer
-      const fileBuffer = fs.readFileSync(file.filepath);
+      // Normalize the files array - ensure that it's always an array
+      const uploadedFiles = Array.isArray(files.file)
+        ? files.file
+        : [files.file];
 
-      // Convert the buffer to a base64 string
-      const base64Data = fileBuffer.toString("base64");
+      // Iterate over each file in the files object
+      for (const file of uploadedFiles) {
+        const fileName = file.originalFilename ?? "uploaded_file";
+        const mimeType = file.mimetype ?? "application/octet-stream";
 
-      // Create the payload to send to Google Apps Script
-      const bodyData = {
-        fileName: fileName,
-        mimeType: mimeType,
-        file: base64Data,
-      };
+        // Read the file into a buffer
+        const fileBuffer = fs.readFileSync(file.filepath);
 
-      try {
-        const response = await fetch(GOOGLE_SCRIPT_WEB_APP_URL, {
-          method: "POST",
-          body: JSON.stringify(bodyData),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        // Convert the buffer to a base64 string
+        const base64Data = fileBuffer.toString("base64");
 
-        const data: GoogleScriptResponse = await response.json();
+        // Create the payload to send to Google Apps Script
+        const bodyData = {
+          fileName: fileName,
+          mimeType: mimeType,
+          file: base64Data,
+        };
 
-        if (response.ok) {
-          return res.status(200).json(data.file);
-        } else {
-          console.error("Error from Google Apps Script:", data.error);
-          return res.status(500).json({ success: false, error: data.error });
+        try {
+          const response = await fetch(GOOGLE_SCRIPT_WEB_APP_URL, {
+            method: "POST",
+            body: JSON.stringify(bodyData),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data: GoogleScriptResponse = await response.json();
+
+          if (response.ok) {
+            fileResponses.push({ success: true, file: data.file });
+          } else {
+            console.error("Error from Google Apps Script:", data.error);
+            fileResponses.push({ success: false, error: data.error });
+          }
+        } catch (error) {
+          console.error(
+            "Error sending to Google Apps Script:",
+            (error as Error).message,
+          );
+          fileResponses.push({
+            success: false,
+            error: (error as Error).message,
+          });
         }
-      } catch (error) {
-        console.error(
-          "Error sending to Google Apps Script:",
-          (error as Error).message,
-        );
-        return res
-          .status(500)
-          .json({ success: false, error: (error as Error).message });
       }
+
+      console.log(JSON.stringify(fileResponses));
+
+      // Return the responses for all the files
+      return res.status(200).json(fileResponses);
     });
   } else if (req.method === "GET") {
     try {

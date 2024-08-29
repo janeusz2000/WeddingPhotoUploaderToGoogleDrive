@@ -1,14 +1,14 @@
 :root {
   --dark-green: #274442;
-  --blue-green: #4F7375;
-  --light-green: #748E81;
-  --grey-green: #8FA38E;
-  --another-grey-green: #A3BAB4;
-  --white: #E9E5E3;
+  --blue-green: #4f7375;
+  --light-green: #748e81;
+  --grey-green: #8fa38e;
+  --another-grey-green: #a3bab4;
+  --white: #e9e5e3;
 }
 
 body {
-  background-image: url('public/image/background_image3.jpg');
+  background-image: url("public/image/background_image3.jpg");
   background-size: cover;
   background-repeat: no-repeat;
 }
@@ -20,6 +20,7 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
+  font-family: "Great Vibes", cursive; /* Apply the font globally */
 }
 
 label#uploadLabel {
@@ -62,4 +63,59 @@ label#uploadLabel:active {
 
 .spin-slow {
   animation: spin-slow 2s linear infinite;
+}
+
+#uploadStatusBox {
+  margin-top: 20px;
+  overflow-y: auto;
+  padding: 20px;
+  background-color: var(--dark-green); /* Matches the upload label color */
+  color: var(--white);
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 15px;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+  text-align: left;
+  width: 100%; /* Full width */
+  max-width: 80%; /* Adjust width as needed */
+}
+
+#uploadStatusBox::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 15px;
+}
+
+#uploadStatusBox::-webkit-scrollbar-thumb {
+  background-color: var(--blue-green);
+  border-radius: 15px;
+}
+
+#uploadStatusBox::-webkit-scrollbar-track {
+  background-color: var(--dark-green);
+  border-radius: 15px;
+}
+
+#uploadStatusBox .file-status {
+  display: flex; /* Use flexbox for alignment */
+  align-items: center;
+  margin-bottom: 20px;
+  border-radius: 15px;
+}
+
+#uploadStatusBox .status-icon {
+  margin-right: 16px; /* Space between the icon and the file name */
+}
+
+#uploadStatusBox .file-status span {
+  margin-top: 10px;
+  display: block;
+  border-radius: 15px;
+}
+
+#uploadStatusBox .file-name {
+  flex-grow: 1; /* Allow the file name to take up the remaining space */
+  display: block;
+  border-radius: 15px;
 }

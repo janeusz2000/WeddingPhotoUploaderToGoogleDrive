@@ -9,9 +9,9 @@ const config: Config = {
   theme: {
     extend: {
       backgroundImage: {
-        'eucalyptus': "url('/image/background_eucalyptus.jpg')",
-        'image3': "url('/image/background_image3.jpg')",
-        'eucalyptus2': "url('/image/eucalyptus2.jpg')",
+        eucalyptus: "url('/image/background_eucalyptus.jpg')",
+        image3: "url('/image/background_image3.jpg')",
+        eucalyptus2: "url('/image/eucalyptus2.jpg')",
       },
     },
   },
