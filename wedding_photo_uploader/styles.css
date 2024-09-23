@@ -23,6 +23,13 @@ html {
   font-family: "Great Vibes", cursive; /* Apply the font globally */
 }
 
+.upload-label-container {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  padding: 0 16px; /* Add padding to give space on the sides */
+}
+
 label#uploadLabel {
   display: inline-block;
   margin: 1px 16px;
@@ -37,6 +44,23 @@ label#uploadLabel {
     background-color 0.3s ease,
     transform 0.3s ease;
   text-align: center;
+  width: 100%; /* Ensure the label takes up full width */
+  max-width: 300px; /* Cap the maximum width */
+}
+
+/* Media query to handle small screens */
+@media (max-width: 370px) {
+  label#uploadLabel {
+    padding: 24px 16px; /* Reduce padding to fit smaller screens */
+    max-width: 90%; /* Ensure the button doesn't exceed 90% of screen width */
+    margin: 0 auto; /* Center the button horizontally */
+    font-size: 24px; /* Reduce font size on very small screens */
+  }
+
+  .upload-label-container {
+    width: 100%;
+    padding: 0 8px; /* Add padding to ensure space on both sides */
+  }
 }
 
 label#uploadLabel:hover {
@@ -79,7 +103,12 @@ label#uploadLabel:active {
     transform 0.3s ease;
   text-align: left;
   width: 100%; /* Full width */
-  max-width: 80%; /* Adjust width as needed */
+  max-width: 300px; /* Fix the width to maintain symmetry */
+  height: auto; /* Adjust height automatically */
+  display: flex;
+  flex-direction: column; /* Ensure content is aligned vertically */
+  justify-content: center; /* Center content vertically */
+  align-items: center; /* Center content horizontally */
 }
 
 #uploadStatusBox::-webkit-scrollbar {
@@ -115,7 +144,31 @@ label#uploadLabel:active {
 }
 
 #uploadStatusBox .file-name {
-  flex-grow: 1; /* Allow the file name to take up the remaining space */
+  flex-grow: 1;
   display: block;
   border-radius: 15px;
+}
+
+.max-file-note {
+  font-family: "Arial Black", sans-serif;
+  color: var(--dark-green);
+  text-align: center;
+  font-size: 18px;
+  margin-top: 16px;
+  padding-left: 16px;
+  padding-right: 16px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+}
+
+@media (max-width: 370px) {
+  .max-file-note {
+    font-size: 12px;
+    padding-left: 12px;
+    padding-right: 12px;
+    height: auto;
+  }
 }
