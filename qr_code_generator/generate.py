@@ -1,7 +1,7 @@
 import qrcode
 
 # Define the URL you want to encode
-url = "https://www.wedding-photo-uploader.com"
+url = "https://www.wedding-photo-uploader.app"
 
 # Create QR code instance
 qr = qrcode.QRCode(

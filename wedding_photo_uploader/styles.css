@@ -165,10 +165,16 @@ label#uploadLabel:active {
 }
 
 @media (max-width: 370px) {
-  .max-file-note {
-    font-size: 12px;
-    padding-left: 12px;
-    padding-right: 12px;
-    height: auto;
+  label#uploadLabel {
+    padding: 24px 16px; /* Reduce padding to fit smaller screens */
+    max-width: 90%; /* Ensure the button doesn't exceed 90% of screen width */
+    margin: 0 auto; /* Center the button horizontally */
+    font-size: 24px; /* Reduce font size on very small screens */
+    box-sizing: border-box; /* Ensure padding is included in the width calculation */
+  }
+
+  .upload-label-container {
+    width: 100%;
+    padding: 0 16px; /* Add padding to ensure space on both sides */
   }
 }
