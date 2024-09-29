@@ -1,6 +1,7 @@
 import { useState, ChangeEvent } from "react";
 import { FaCheckCircle, FaTimesCircle, FaSpinner } from "react-icons/fa";
 import { Quicksand } from "next/font/google";
+import zlib from "zlib";
 
 const darkGreen = "#274442";
 const lightGreen = "#748E81";
@@ -66,17 +67,21 @@ export default function Home() {
         const fileIndex = validFiles.indexOf(file);
         updateFileStatus(fileIndex, UploadStatus.UPLOADING);
 
-        const formData = new FormData();
-        formData.append("file", file);
-
-        // Timeout promise to fail the upload after 12 seconds
-        const timeout: Promise<never> = new Promise((_, reject) => {
-          setTimeout(() => {
-            reject(new Error("Upload timed out after 5 minues"));
-          }, 5*60*1000);
-        });
-
         try {
+          // prepare data
+          const formData = new FormData();
+          formData.append("file", file);
+
+          // Timeout promise to fail the upload after 5 minutes
+          const timeout: Promise<never> = new Promise((_, reject) => {
+            setTimeout(
+              () => {
+                reject(new Error("Upload timed out after 5 minues"));
+              },
+              5 * 60 * 1000,
+            );
+          });
+
           // Race the upload promise against the timeout promise
           const uploadPromise: Promise<Response> = fetch("/api/files", {
             method: "POST",

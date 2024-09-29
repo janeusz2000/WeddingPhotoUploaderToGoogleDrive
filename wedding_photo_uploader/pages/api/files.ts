@@ -1,20 +1,30 @@
+"use server";
+
 import { NextApiRequest, NextApiResponse } from "next";
 import formidable from "formidable";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
+import { Storage } from "@google-cloud/storage";
+import path from "path";
 
 // overwrite vercel max timeout duration
 export const maxDuration = 5 * 60;
-
-const GOOGLE_SCRIPT_WEB_APP_URL = process.env.GOOGLE_SCRIPT_WEB_APP_URL
-  ? process.env.GOOGLE_SCRIPT_WEB_APP_URL
-  : "";
 
 export const config = {
   api: {
     bodyParser: false, // Disable Next.js body parsing so we can handle it with formidable
   },
 };
+
+const storage = new Storage({
+  projectId: process.env.GCP_PROJECT_ID,
+  credentials: {
+    client_email: process.env.GCP_CLIENT_EMAIL,
+    private_key: process.env.GCP_PRIVATE_KEY?.replace(/\\n/g, "\n") ?? "",
+  },
+});
+
+const bucket = storage.bucket(process.env.GCP_BUCKET_NAME ?? "");
 
 // Type definitions for the expected response from Google Apps Script
 interface GoogleScriptResponse {
@@ -59,40 +69,35 @@ export default async function handler(
         const fileBuffer = fs.readFileSync(file.filepath);
 
         // Convert the buffer to a base64 string
-        const base64Data = fileBuffer.toString("base64");
-
-        // Create the payload to send to Google Apps Script
-        const bodyData = {
-          fileName: fileName,
-          mimeType: mimeType,
-          file: base64Data,
-        };
-
         try {
-          const response = await fetch(GOOGLE_SCRIPT_WEB_APP_URL, {
-            method: "POST",
-            body: JSON.stringify(bodyData),
-            headers: {
-              "Content-Type": "application/json",
-            },
+          const base64Data = fileBuffer.toString("base64");
+          const buffer = Buffer.from(base64Data, "base64");
+          const extension = path.extname(file.originalFilename);
+          const blob = bucket.file(`${Date.now()}-${fileName}${extension}`);
+          const blobStream = blob.createWriteStream({
+            resumable: false,
+            contentType: file.type,
           });
 
-          const data: GoogleScriptResponse = await response.json();
+          blobStream.on("error", (err) => {
+            const errorMessage = JSON.stringify(err);
+            console.error(
+              `Error during uploading file to bucket: ${errorMessage}`,
+            );
+            fileResponses.push({ success: false, error: errorMessage});
+          });
 
-          if (response.ok) {
+          blobStream.on("finish", () => {
             fileResponses.push({ success: true });
-          } else {
-            console.error("Error from Google Apps Script:", data.error);
-            fileResponses.push({ success: false, error: data.error });
-          }
-        } catch (error) {
-          console.error(
-            "Error sending to Google Apps Script:",
-            (error as Error).message,
-          );
+          });
+
+          blobStream.end(buffer);
+        } catch (error: any) {
+          const errorMessage = JSON.stringify(error);
+          console.error(`Error uploading file to bucket: ${errorMessage}`);
           fileResponses.push({
             success: false,
-            error: (error as Error).message,
+            error: errorMessage,
           });
         }
       }
@@ -102,24 +107,8 @@ export default async function handler(
       // Return the responses for all the files
       return res.status(200).json(fileResponses);
     });
-  } else if (req.method === "GET") {
-    try {
-      const response = await fetch(GOOGLE_SCRIPT_WEB_APP_URL);
-      const data = await response.json();
-
-      if (data) {
-        return res.status(200).json(data);
-      } else {
-        return res.status(500).json({ success: false });
-      }
-    } catch (error) {
-      console.error("Error fetching files:", (error as Error).message);
-      return res
-        .status(500)
-        .json({ success: false, error: (error as Error).message });
-    }
   } else {
-    res.setHeader("Allow", ["GET", "POST"]);
+    res.setHeader("Allow", ["POST"]);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
