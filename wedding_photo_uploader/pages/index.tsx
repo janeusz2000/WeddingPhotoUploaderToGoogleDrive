@@ -72,8 +72,8 @@ export default function Home() {
         // Timeout promise to fail the upload after 12 seconds
         const timeout: Promise<never> = new Promise((_, reject) => {
           setTimeout(() => {
-            reject(new Error("Upload timed out after 12 seconds"));
-          }, 12000);
+            reject(new Error("Upload timed out after 5 minues"));
+          }, 5*60*1000);
         });
 
         try {

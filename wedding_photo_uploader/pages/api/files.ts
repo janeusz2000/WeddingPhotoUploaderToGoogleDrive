@@ -3,6 +3,9 @@ import formidable from "formidable";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 
+// overwrite vercel max timeout duration
+export const maxDuration = 5 * 60;
+
 const GOOGLE_SCRIPT_WEB_APP_URL = process.env.GOOGLE_SCRIPT_WEB_APP_URL
   ? process.env.GOOGLE_SCRIPT_WEB_APP_URL
   : "";
