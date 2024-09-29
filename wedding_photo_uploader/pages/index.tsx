@@ -1,12 +1,16 @@
 import { useState, ChangeEvent } from "react";
 import { FaCheckCircle, FaTimesCircle, FaSpinner } from "react-icons/fa";
-import { Great_Vibes } from "next/font/google";
+import { Quicksand } from "next/font/google";
 
 const darkGreen = "#274442";
 const lightGreen = "#748E81";
 const white = "#E9E5E3";
 
-const greatVibes = Great_Vibes({
+const maximumSizeMessage =
+  "Maksymalny rozmiar pojedynczego zdjecia / filmu wynosi 50 MB";
+const choosePhotoMessage = "Wybierz zdjecia lub film";
+
+const quicksand = Quicksand({
   weight: "400",
   subsets: ["latin"],
 });
@@ -28,9 +32,10 @@ export default function Home() {
     FileUploadStatus[]
   >([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [isActive, setIsActive] = useState(false); // Track if button is active or not
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
+    if (event.target.files && event.target.files.length > 0) {
       const maxFileSizeMB = 50;
       const maxFileSizeBytes = maxFileSizeMB * 1024 * 1024;
 
@@ -43,6 +48,8 @@ export default function Home() {
         alert(
           "All selected files are too large. Each file must be under 50MB.",
         );
+        event.target.value = "";
+        setIsActive(false);
         return;
       }
 
@@ -53,6 +60,7 @@ export default function Home() {
 
       setIsUploading(true);
       setFileUploadStatuses(initialStatuses);
+      setIsActive(true); // Set button as active when files are selected
 
       for (const file of validFiles) {
         const fileIndex = validFiles.indexOf(file);
@@ -91,6 +99,9 @@ export default function Home() {
         setIsUploading(false);
         setFileUploadStatuses([]);
       }, 2000);
+    } else {
+      setIsActive(false); // Reset button state if upload is canceled
+      event.target.value = "";
     }
   };
 
@@ -109,7 +120,7 @@ export default function Home() {
       >
         {fileUploadStatuses.length === 0 && (
           <div
-            className={`${greatVibes.className} flex flex-col items-center bg-[${darkGreen}] p-8 rounded-lg shadow-lg text-center transition-transform transform hover:scale-125 hover:bg-[#8FA38E] w-full max-w-md`}
+            className={`${quicksand.className} flex flex-col items-center bg-[${darkGreen}] p-8 `}
           >
             <div className="upload-label-container">
               <label
@@ -117,7 +128,7 @@ export default function Home() {
                 htmlFor="file"
                 className={`text-[${white}]`}
               >
-                Select Photos or Videos
+                {`${choosePhotoMessage}`}
               </label>
             </div>
             <input
@@ -129,8 +140,8 @@ export default function Home() {
               onChange={handleFileChange}
               className={`mt-4 cursor-pointer text-[${lightGreen}]`}
             />
-            <p className="max-file-note mt-4">
-              Max file size allowed is 50MB per file.
+            <p className={`${quicksand.className} max-file-note mt-4`}>
+              {`${maximumSizeMessage}`}
             </p>
           </div>
         )}
@@ -138,7 +149,7 @@ export default function Home() {
         {isUploading && (
           <div
             id="uploadStatusBox"
-            className={`${greatVibes.className} bg-[${darkGreen}]`}
+            className={`${quicksand.className} bg-[${darkGreen}]`}
           >
             {fileUploadStatuses.map((fileStatus, index) => (
               <div key={index} className="file-status">

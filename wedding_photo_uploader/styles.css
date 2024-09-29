@@ -16,18 +16,24 @@ body {
 body,
 html {
   height: 100%;
+  width: 100%;
   margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: "Great Vibes", cursive; /* Apply the font globally */
+  font-family: "Great Vibes", cursive;
+  box-sizing: border-box;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 .upload-label-container {
   width: 100%;
   display: flex;
-  justify-content: center; /* Center horizontally */
-  padding: 0 16px; /* Add padding to give space on the sides */
+  justify-content: center;
+  padding: 0 16px;
 }
 
 label#uploadLabel {
@@ -40,75 +46,65 @@ label#uploadLabel {
   font-weight: bold;
   border-radius: 15px;
   cursor: pointer;
-  transition:
-    background-color 0.3s ease,
-    transform 0.3s ease;
+  transition: background-color 0.3s ease;
   text-align: center;
-  width: 100%; /* Ensure the label takes up full width */
-  max-width: 300px; /* Cap the maximum width */
+  width: 100%;
+  max-width: 400px;
 }
 
 /* Media query to handle small screens */
 @media (max-width: 370px) {
   label#uploadLabel {
-    padding: 24px 16px; /* Reduce padding to fit smaller screens */
-    max-width: 90%; /* Ensure the button doesn't exceed 90% of screen width */
-    margin: 0 auto; /* Center the button horizontally */
-    font-size: 24px; /* Reduce font size on very small screens */
+    padding: 24px 16px;
+    max-width: 90%;
+    margin: 0 auto;
+    font-size: 24px;
   }
 
   .upload-label-container {
     width: 100%;
-    padding: 0 8px; /* Add padding to ensure space on both sides */
+    padding: 0 8px;
   }
 }
 
+/* Remove transform: scale effects and use background-color change for both hover and active states */
 label#uploadLabel:hover {
   background-color: var(--blue-green);
-  transform: scale(1.25);
 }
 
-label#uploadLabel:active {
-  transform: scale(0.95);
+/* Disable hover effect on touch devices */
+@media (pointer: coarse) {
+  /* When we wait for the upload - we change state of the button to indicate that it was clicked. */
+  label#uploadLabel:active {
+    background-color: var(--blue-green);
+  }
+  label#uploadLabel:hover {
+    background-color: var(--dark-green); /* Same as the default color */
+  }
 }
 
 #file {
   display: none;
 }
 
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.spin-slow {
-  animation: spin-slow 2s linear infinite;
-}
-
 #uploadStatusBox {
   margin-top: 20px;
   overflow-y: auto;
   padding: 20px;
-  background-color: var(--dark-green); /* Matches the upload label color */
+  background-color: var(--dark-green);
   color: var(--white);
   font-size: 24px;
   font-weight: bold;
   border-radius: 15px;
-  transition:
-    background-color 0.3s ease,
-    transform 0.3s ease;
+  transition: background-color 0.3s ease;
   text-align: left;
-  width: 100%; /* Full width */
-  max-width: 300px; /* Fix the width to maintain symmetry */
-  height: auto; /* Adjust height automatically */
+  width: 100%;
+  max-width: 300px;
+  height: auto;
   display: flex;
-  flex-direction: column; /* Ensure content is aligned vertically */
-  justify-content: center; /* Center content vertically */
-  align-items: center; /* Center content horizontally */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 #uploadStatusBox::-webkit-scrollbar {
@@ -127,14 +123,14 @@ label#uploadLabel:active {
 }
 
 #uploadStatusBox .file-status {
-  display: flex; /* Use flexbox for alignment */
+  display: flex;
   align-items: center;
   margin-bottom: 20px;
   border-radius: 15px;
 }
 
 #uploadStatusBox .status-icon {
-  margin-right: 16px; /* Space between the icon and the file name */
+  margin-right: 16px;
 }
 
 #uploadStatusBox .file-status span {
@@ -150,7 +146,6 @@ label#uploadLabel:active {
 }
 
 .max-file-note {
-  font-family: "Arial Black", sans-serif;
   color: var(--dark-green);
   text-align: center;
   font-size: 18px;
@@ -166,15 +161,14 @@ label#uploadLabel:active {
 
 @media (max-width: 370px) {
   label#uploadLabel {
-    padding: 24px 16px; /* Reduce padding to fit smaller screens */
-    max-width: 90%; /* Ensure the button doesn't exceed 90% of screen width */
-    margin: 0 auto; /* Center the button horizontally */
-    font-size: 24px; /* Reduce font size on very small screens */
-    box-sizing: border-box; /* Ensure padding is included in the width calculation */
+    padding: 24px 16px;
+    max-width: 90%;
+    margin: 0 auto;
+    font-size: 24px;
   }
 
   .upload-label-container {
     width: 100%;
-    padding: 0 16px; /* Add padding to ensure space on both sides */
+    padding: 0 16px;
   }
 }
