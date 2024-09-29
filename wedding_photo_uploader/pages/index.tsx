@@ -69,8 +69,16 @@ export default function Home() {
         const formData = new FormData();
         formData.append("file", file);
 
+        // Timeout promise to fail the upload after 12 seconds
+        const timeout = new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(new Error("Upload timed out after 12 seconds"));
+          }, 12000);
+        });
+
         try {
-          const response = await fetch("/api/files", {
+          // Race the upload promise against the timeout promise
+          const uploadPromise = fetch("/api/files", {
             method: "POST",
             body: formData,
             headers: {
@@ -79,22 +87,26 @@ export default function Home() {
             },
           });
 
-          const result = await response.json();
+          const response = await Promise.race([uploadPromise, timeout]);
 
           if (response.ok) {
+            const result = await response.json();
             updateFileStatus(fileIndex, UploadStatus.SUCCESS);
           } else {
-            console.error("Upload failed:", result.error);
             updateFileStatus(fileIndex, UploadStatus.FAILURE);
-            alert("Upload failed: " + result.error);
+            alert("Upload failed: " + response.statusText);
           }
         } catch (error) {
+          // If the timeout occurs or any error is thrown
           console.error("Error uploading file:", error);
           updateFileStatus(fileIndex, UploadStatus.FAILURE);
-          alert("An unexpected error occurred during the upload.");
+          alert(
+            error.message || "An unexpected error occurred during the upload.",
+          );
         }
       }
 
+      // Reset the UI after uploads finish or fail
       setTimeout(() => {
         setIsUploading(false);
         setFileUploadStatuses([]);
@@ -132,15 +144,15 @@ export default function Home() {
                   {`${choosePhotoMessage}`}
                 </label>
               </div>
-            <input
-              type="file"
-              id="file"
-              name="file"
-              multiple
-              accept="image/*,video/*"
-              onChange={handleFileChange}
-              className={`mt-4 cursor-pointer text-[${lightGreen}]`}
-            />
+              <input
+                type="file"
+                id="file"
+                name="file"
+                multiple
+                accept="image/*,video/*"
+                onChange={handleFileChange}
+                className={`mt-4 cursor-pointer text-[${lightGreen}]`}
+              />
             </div>
             <p className={`${quicksand.className} max-file-note mt-4`}>
               {`${maximumSizeMessage}`}

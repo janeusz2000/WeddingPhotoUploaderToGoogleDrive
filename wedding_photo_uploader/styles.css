@@ -88,23 +88,20 @@ label#uploadLabel:hover {
 }
 
 #uploadStatusBox {
-  margin-top: 20px;
-  overflow-y: auto;
-  padding: 20px;
-  background-color: var(--dark-green);
-  color: var(--white);
-  font-size: 24px;
-  font-weight: bold;
-  border-radius: 15px;
-  transition: background-color 0.3s ease;
-  text-align: left;
   width: 100%;
-  max-width: 300px;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  max-width: 400px; /* Same as uploadLabel */
+  padding: 48px 96px; /* Same as uploadLabel */
+  background-color: var(--dark-green); /* Same as uploadLabel */
+  color: var(--white); /* Text color */
+  font-size: 16px; /* Font size like uploadLabel */
+  font-weight: bold; /* Font weight like uploadLabel */
+  border-radius: 15px; /* Border radius like uploadLabel */
+  display: flex; /* To align content inside */
+  justify-content: center; /* Center the content */
+  align-items: center; /* Center the content vertically */
+  transition: background-color 0.3s ease; /* Smooth transition for background */
+  text-align: center; /* Center text */
+  box-sizing: border-box; /* Ensure padding is included in width */
 }
 
 #uploadStatusBox::-webkit-scrollbar {
@@ -127,6 +124,7 @@ label#uploadLabel:hover {
   align-items: center;
   margin-bottom: 20px;
   border-radius: 15px;
+  justify-content: center;
 }
 
 #uploadStatusBox .status-icon {
@@ -145,6 +143,14 @@ label#uploadLabel:hover {
   border-radius: 15px;
 }
 
+@media (max-width: 420px) {
+  #uploadStatusBox {
+    padding: 24px 16px; /* Adjust padding for smaller screens */
+    max-width: 90%; /* Keep it responsive */
+    font-size: 12px;
+  }
+}
+
 .max-file-note {
   color: var(--dark-green);
   text-align: center;
@@ -160,9 +166,9 @@ label#uploadLabel:hover {
 }
 
 .upload-label-container-child {
-    justify-content: center;
-    display: flex;
-    min-width: 90%;
+  justify-content: center;
+  display: flex;
+  min-width: 90%;
 }
 
 @media (max-width: 420px) {
@@ -175,5 +181,18 @@ label#uploadLabel:hover {
 
   .upload-label-container {
     width: 100%;
+  }
+}
+
+.spin-slow {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
