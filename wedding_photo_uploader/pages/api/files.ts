@@ -68,34 +68,16 @@ export default async function handler(
       // Iterate over each file in the files object
       for (const file of uploadedFiles) {
         const fileName = `${uuidv4()}`;
-        const mimeType = file.mimetype ?? "application/octet-stream";
+        const extension = path.extname(file.originalFilename);
+        const blob = bucket.file(`${Date.now()}-${fileName}${extension}`);
 
         console.log(`Preparing to upload file: ${file.originalFilename}`);
 
         try {
-          console.log(`trying to readFileSYnc()`);
-          // Read the file into a buffer
-          const fileBuffer = fs.readFileSync(file.filepath);
-
-          console.log(`Prepared file buffer: ${JSON.stringify(fileBuffer)}`);
-          const base64Data = fileBuffer.toString("base64");
-
-          console.log(`Base64Data: ${JSON.stringify(base64Data)}`);
-          const buffer = Buffer.from(base64Data, "base64");
-
-          console.log(`buffer: ${JSON.stringify(buffer)}`);
-          const extension = path.extname(file.originalFilename);
-
-          console.log(`extension: ${JSON.stringify(extension)}`);
-          const blob = bucket.file(`${Date.now()}-${fileName}${extension}`);
-
-          console.log(`blob: ${JSON.stringify(blob)}`);
           const blobStream = blob.createWriteStream({
             resumable: false,
-            contentType: file.type,
+            contentType: file.mimetype,
           });
-
-          console.log(`blobStream: ${JSON.stringify(blobStream)}`);
 
           blobStream.on("error", (err) => {
             const errorMessage = JSON.stringify(err);
@@ -110,7 +92,9 @@ export default async function handler(
             fileResponses.push({ success: true });
           });
 
-          blobStream.end(buffer);
+          // Instead of reading the file into memory, pipe the file directly to the blob stream
+          const fileStream = fs.createReadStream(file.filepath);
+          fileStream.pipe(blobStream);
         } catch (error: any) {
           const errorMessage = JSON.stringify(error);
           console.error(`Error uploading file to bucket: ${errorMessage}`);
