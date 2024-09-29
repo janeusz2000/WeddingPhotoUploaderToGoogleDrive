@@ -63,7 +63,7 @@ export default async function handler(
         ? files.file
         : [files.file];
 
-      console.log("Files received:", uploadedFiles.map(f => f.originalFilename));
+      console.log(`Files received: ${JSON.stringify(files)}`);
 
       // Iterate over each file in the files object
       for (const file of uploadedFiles) {
