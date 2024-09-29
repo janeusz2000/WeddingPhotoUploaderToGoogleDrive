@@ -72,12 +72,12 @@ export default async function handler(
 
         console.log(`Preparing to upload file: ${file.originalFilename}`);
 
-        // Read the file into a buffer
-        const fileBuffer = fs.readFileSync(file.filepath);
-
-        console.log(`Prepared file buffer: ${JSON.stringify(fileBuffer)}`);
-
         try {
+          console.log(`trying to readFileSYnc()`);
+          // Read the file into a buffer
+          const fileBuffer = fs.readFileSync(file.filepath);
+
+          console.log(`Prepared file buffer: ${JSON.stringify(fileBuffer)}`);
           const base64Data = fileBuffer.toString("base64");
 
           console.log(`Base64Data: ${JSON.stringify(base64Data)}`);
