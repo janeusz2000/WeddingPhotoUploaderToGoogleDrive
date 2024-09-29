@@ -123,14 +123,15 @@ export default function Home() {
             className={`${quicksand.className} flex flex-col items-center bg-[${darkGreen}] p-8 `}
           >
             <div className="upload-label-container">
-              <label
-                id="uploadLabel"
-                htmlFor="file"
-                className={`text-[${white}]`}
-              >
-                {`${choosePhotoMessage}`}
-              </label>
-            </div>
+              <div className="upload-label-container-child">
+                <label
+                  id="uploadLabel"
+                  htmlFor="file"
+                  className={`text-[${white}]`}
+                >
+                  {`${choosePhotoMessage}`}
+                </label>
+              </div>
             <input
               type="file"
               id="file"
@@ -140,6 +141,7 @@ export default function Home() {
               onChange={handleFileChange}
               className={`mt-4 cursor-pointer text-[${lightGreen}]`}
             />
+            </div>
             <p className={`${quicksand.className} max-file-note mt-4`}>
               {`${maximumSizeMessage}`}
             </p>

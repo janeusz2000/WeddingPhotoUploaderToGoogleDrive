@@ -53,7 +53,7 @@ label#uploadLabel {
 }
 
 /* Media query to handle small screens */
-@media (max-width: 370px) {
+@media (max-width: 420px) {
   label#uploadLabel {
     padding: 24px 16px;
     max-width: 90%;
@@ -159,7 +159,13 @@ label#uploadLabel:hover {
   height: 50px;
 }
 
-@media (max-width: 370px) {
+.upload-label-container-child {
+    justify-content: center;
+    display: flex;
+    min-width: 90%;
+}
+
+@media (max-width: 420px) {
   label#uploadLabel {
     padding: 24px 16px;
     max-width: 90%;
@@ -169,6 +175,5 @@ label#uploadLabel:hover {
 
   .upload-label-container {
     width: 100%;
-    padding: 0 16px;
   }
 }
