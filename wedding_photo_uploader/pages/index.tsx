@@ -70,7 +70,7 @@ export default function Home() {
         formData.append("file", file);
 
         // Timeout promise to fail the upload after 12 seconds
-        const timeout = new Promise((_, reject) => {
+        const timeout: Promise<never> = new Promise((_, reject) => {
           setTimeout(() => {
             reject(new Error("Upload timed out after 12 seconds"));
           }, 12000);
@@ -78,7 +78,7 @@ export default function Home() {
 
         try {
           // Race the upload promise against the timeout promise
-          const uploadPromise = fetch("/api/files", {
+          const uploadPromise: Promise<Response> = fetch("/api/files", {
             method: "POST",
             body: formData,
             headers: {
@@ -96,7 +96,7 @@ export default function Home() {
             updateFileStatus(fileIndex, UploadStatus.FAILURE);
             alert("Upload failed: " + response.statusText);
           }
-        } catch (error) {
+        } catch (error: any) {
           // If the timeout occurs or any error is thrown
           console.error("Error uploading file:", error);
           updateFileStatus(fileIndex, UploadStatus.FAILURE);
