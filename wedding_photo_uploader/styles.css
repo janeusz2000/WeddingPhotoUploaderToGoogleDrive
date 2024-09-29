@@ -97,11 +97,14 @@ label#uploadLabel:hover {
   font-weight: bold; /* Font weight like uploadLabel */
   border-radius: 15px; /* Border radius like uploadLabel */
   display: flex; /* To align content inside */
-  justify-content: center; /* Center the content */
-  align-items: center; /* Center the content vertically */
+  flex-direction: column; /* Ensure the content stacks vertically */
+  justify-content: flex-start; /* Align content at the top */
+  align-items: center; /* Center the content horizontally */
   transition: background-color 0.3s ease; /* Smooth transition for background */
   text-align: center; /* Center text */
   box-sizing: border-box; /* Ensure padding is included in width */
+  max-height: 80vh; /* Allow it to grow dynamically but limit it */
+  overflow-y: auto; /* Allow scrolling if content exceeds the max-height */
 }
 
 #uploadStatusBox::-webkit-scrollbar {
@@ -120,27 +123,22 @@ label#uploadLabel:hover {
 }
 
 #uploadStatusBox .file-status {
+  width: 100%;
   display: flex;
+  justify-content: flex-start;
   align-items: center;
   margin-bottom: 20px;
+  padding: 10px;
   border-radius: 15px;
-  justify-content: center;
 }
 
 #uploadStatusBox .status-icon {
   margin-right: 16px;
 }
 
-#uploadStatusBox .file-status span {
-  margin-top: 10px;
-  display: block;
-  border-radius: 15px;
-}
-
 #uploadStatusBox .file-name {
   flex-grow: 1;
-  display: block;
-  border-radius: 15px;
+  text-align: left;
 }
 
 @media (max-width: 420px) {
