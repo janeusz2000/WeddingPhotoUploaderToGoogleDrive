@@ -1,6 +1,6 @@
 [
   {
-    "origin": ["http://localhost:3000","https://wedding-photo-uploader.app"],
+    "origin": ["http://localhost:3000", "https://wedding-photo-uploader.app"],
     "method": ["PUT"],
     "responseHeader": ["Content-Type"],
     "maxAgeSeconds": 3600
