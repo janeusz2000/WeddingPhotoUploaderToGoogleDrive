@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FaCheckCircle, FaTimesCircle, FaSpinner } from "react-icons/fa";
-
 import { Quicksand } from "next/font/google";
 
 const quicksand = Quicksand({
@@ -11,6 +10,8 @@ const quicksand = Quicksand({
 const darkGreen = "#274442";
 const lightGreen = "#748E81";
 const white = "#E9E5E3";
+const UPLOADING_WAIT_UNTIL_FINISHED: number = 1000;
+const DISPLAY_THANKS_MESSGE_DURATION: number = 5000;
 
 const choosePhotoMessage = "Wybierz zdjecia lub film";
 
@@ -27,6 +28,8 @@ interface UploadStatusTrack {
 }
 
 const UploadImage = () => {
+  const [displayThanksMessage, setDisplayThanksMessage] =
+    useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadStatuses, setUploadStatuses] = useState<UploadStatusTrack[]>([]);
 
@@ -100,7 +103,14 @@ const UploadImage = () => {
       }
     }
 
-    setIsUploading(false);
+    setTimeout(() => {
+      setIsUploading(false);
+      setDisplayThanksMessage(true);
+
+      setTimeout(() => {
+        setDisplayThanksMessage(false);
+      }, DISPLAY_THANKS_MESSGE_DURATION);
+    }, UPLOADING_WAIT_UNTIL_FINISHED);
   };
 
   return (
@@ -132,8 +142,7 @@ const UploadImage = () => {
           ))}
         </div>
       )}
-      ,
-      {!isUploading && (
+      {!isUploading && !displayThanksMessage && (
         <>
           <div className="upload-label-container">
             <div
@@ -156,6 +165,18 @@ const UploadImage = () => {
             </div>
           </div>
         </>
+      )}
+      {displayThanksMessage && (
+          <>
+            <div className={`thanks-message ${quicksand.className} text-xl flex flex-col items-center`}>
+              <div className="w-full items-center justify-center flex flex-row">
+                <p>Dziekujemy!</p>
+              </div>
+              <div className="w-full">
+                <p>Wyslemy wam zdjecia po weselu!</p>
+              </div>
+            </div>
+          </>
       )}
     </>
   );

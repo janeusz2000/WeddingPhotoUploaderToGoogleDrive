@@ -194,3 +194,7 @@ label#uploadLabel:hover {
     transform: rotate(360deg);
   }
 }
+
+.thanks-message {
+  text-align: center;
+}
